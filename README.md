@@ -19,8 +19,8 @@ The goal of this project is to provide a set of scripts that can be used to hard
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/your-username/hardening-as-code.git
-    cd hardening-as-code
+    git clone https://github.com/Eljakani/HaC.git
+    cd HaC
     ```
 
 2. Review and customize the scripts according to your system and security requirements.
@@ -37,10 +37,6 @@ The goal of this project is to provide a set of scripts that can be used to hard
 ## Contributing
 
 If you have suggestions, improvements, or additional hardening measures, feel free to contribute to this project. Fork the repository, make your changes, and submit a pull request.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
 
 ## Acknowledgments
 
