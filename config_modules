@@ -1,0 +1,5 @@
+secure_boot 4
+update_preloaded_keys 4
+bootloader_password 2
+just_a_test 3
+spmsdfl 8
