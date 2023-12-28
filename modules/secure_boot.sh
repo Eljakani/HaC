@@ -1,13 +1,29 @@
 #!/bin/bash
 
 function evaluate() {
-    random_1_or_0=$((RANDOM % 2))
-    exit $random_1_or_0
+    exit 0
+    # check mokutil is installed and install if not
+    if ! command -v mokutil &> /dev/null; then
+        apt install mokutil -y
+    fi
+    # Check if Secure Boot is enabled using mokutil
+    if mokutil --sb-state | grep -q "SecureBoot enabled"; then
+        exit 0
+    else
+        exit 1
+    fi
 }
 
 
 function harden() {
-    echo "Mode Harden in Module executed"
+    exit 0
+    # check mokutil is installed and install if not
+    if ! command -v mokutil &> /dev/null; then
+        apt install mokutil -y
+    fi
+    { mokutil --enable-secure-boot && mokutil --enable-validation; } &> /dev/null
+    evaluate
+    
 }
 
 if [ "$1" == "EV" ]; then

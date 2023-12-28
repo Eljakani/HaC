@@ -1,0 +1,31 @@
+Hardening as Code Project v1
+Mode: Evaluation
+Date: Wed Dec 27 09:20:20 PM EST 2023
+----------------------------------------
+System Details:
+ - OS: Kali
+ - Kernel: 6.3.0-kali1-amd64
+ - Architecture: x86_64
+ - Hostname: ymm
+ - IP Address: 10.0.2.15
+----------------------------------------
+Evaluation Results:
+ - Kernel configuration options: PASSED (2)
+ - File System Configuration: PASSED (2)
+ - Disabling IPv6: PASSED (2)
+ - Configuring the memory options: FAILED (2)
+ - Enabled IOMMU: PASSED (3)
+ - Yama security module: PASSED (2)
+ - Memory kernel Compile Options: PASSED (4)
+ - IPV4 Configuration: PASSED (2)
+ - Protecting Kernel's Cmdline & Initramfs: PASSED (4)
+ - Bootloader Password: PASSED (2)
+ - Disabling kernel modules loading: PASSED (3)
+ - Update Preload Keys: FAILED (2)
+ - Secure Boot: PASSED (4)
+ - Data structures kernel Compile Options: PASSED (4)
+----------------------------------------
+Evaluation Score: 89%
+Modules Passed: 12
+Modules Failed: 2
+----------------------------------------

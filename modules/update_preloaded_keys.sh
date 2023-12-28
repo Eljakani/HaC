@@ -1,13 +1,13 @@
 #!/bin/bash
 
 function evaluate() {
-    random_1_or_0=$((RANDOM % 2))
-    exit $random_1_or_0
+    exit 1
+    
 }
 
 
 function harden() {
-    echo "Mode Harden in Module executed"
+    exit 1
 }
 
 if [ "$1" == "EV" ]; then

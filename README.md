@@ -10,7 +10,7 @@ The goal of this project is to provide a set of scripts that can be used to hard
 
 ### Prerequisites
 
-- A Linux system (compatible with Debian-based distributions for the provided example script).
+- A Linux system (compatible with Debian-based distributions only).
 - `sudo` privileges for executing system-level commands.
 - Basic knowledge of Bash scripting.
 
@@ -23,16 +23,14 @@ The goal of this project is to provide a set of scripts that can be used to hard
     cd HaC
     ```
 
-2. Review and customize the scripts according to your system and security requirements.
-
-3. Run the scripts:
+2. Run the scripts:
 
     ```bash
-    chmod +x hardening_script.sh
-    ./hardening_script.sh
+    chmod +x run.sh
+    ./run.sh
     ```
 
-4. Follow any prompts and instructions provided by the scripts.
+3. Follow any prompts and instructions provided by the scripts.
 
 ## Contributing
 

@@ -1,135 +1,202 @@
 #!/bin/bash
 
-CONFIG_FILE="./config_modules"
-MODULES_DIR="./modules"
 # Check if script is run as root
 if [ "$EUID" -ne 0 ]; then
-    #ask for privilege escalation
+    # Ask for privilege escalation
     whiptail --backtitle "Hardening as Code Project v1" --title "Privilege Escalation" --msgbox "This script requires root privileges. Please run as root." 10 60
-    # use pkuth to escalate privileges
+    # Use pkuth to escalate privileges
     sudo "$0"
     exit
-
 fi
 
+
+
+MODULES_FILE="$(pwd)/modules.sh"
+MODULES_DIR="$(pwd)/modules"
+REPORTS_DIR="$(pwd)/reports"
+
+source "$MODULES_FILE"
+
+create_report() {
+    local mode="$1"
+    report_file="$REPORTS_DIR/$(date +%Y-%m-%d_%H-%M-%S).txt"
+    # create the report header
+    echo "Hardening as Code Project v1" > "$report_file"
+    echo "Mode: $mode" >> "$report_file"
+    echo "Date: $(date)" >> "$report_file"
+    echo "----------------------------------------" >> "$report_file"
+    echo "System Details:" >> "$report_file"
+    echo " - OS: $(lsb_release -si)" >> "$report_file"
+    echo " - Kernel: $(uname -r)" >> "$report_file"
+    echo " - Architecture: $(uname -m)" >> "$report_file"
+    echo " - Hostname: $(hostname)" >> "$report_file"
+    echo " - IP Address: $(hostname -I | awk '{print $1}')" >> "$report_file"
+    echo "----------------------------------------" >> "$report_file"
+    echo "Evaluation Results:" >> "$report_file"
+    echo "$report_file"
+}
+
+confirm_exit() {
+    if (whiptail --backtitle "Hardening as Code Project v1" --title "Confirm Exit" --yesno "Are you sure you want to exit?" 10 60) then
+        log_warning "User cancelled"
+        exit 1
+    fi
+}
 
 log_warning() {
     echo "$(tput setaf 3)[WARN] $1 $(tput sgr0)"
 }
+
 log_error() {
     echo "$(tput setaf 1)[ERROR] $1 $(tput sgr0)"
 }
+
+log_success() {
+    echo "$(tput setaf 2)[SUCCESS] $1 $(tput sgr0)"
+}
+
 main_menu() {
     system_details="System Details:\n - OS: $(lsb_release -si)\n - Kernel: $(uname -r)\n - Architecture: $(uname -m)\n - Hostname: $(hostname)\n - IP Address: $(hostname -I | awk '{print $1}')"
     mode=$(whiptail --backtitle "Hardening as Code Project v1 - @Eljakani" --title "Main Menu" --menu "$system_details\n\nChoose your option" 20 60 4 \
     "EV" "> Evaluate System" \
     "HA" "> Harden System"\
     "HELP" "> More Info on Modules" 3>&1 1>&2 2>&3)
-exitstatus=$?
-if [ $exitstatus -eq 0 ]; then
-    if [ "$mode" == "EV" ]; then
-        # evaluate system
-        evaluate_system
-        main_menu
-    elif [ "$mode" == "HA" ]; then
-        # harden system
-        harden_system
-        main_menu
-    elif [ "$mode" == "HELP" ]; then
-        # Show all modules as menu and show description of selected module
-        module=$(whiptail --title "Select Module" --menu "Choose your option" 15 60 4 \
-        "${modules[@]}" 3>&1 1>&2 2>&3)
-        exitstatus=$?
-        if [ $exitstatus -eq 0 ]; then
-            description=$(./modules/$module.sh "HELP")
-            whiptail --backtitle "Hardening as Code Project v1" --title "Module Description" --msgbox "$description" 15 60
-            main_menu
+    exitstatus=$?
+    if [ $exitstatus -eq 0 ]; then
+        if [ "$mode" == "EV" ]; then
+            # Evaluate system
+            report_file=$(create_report "Evaluation")
+            evaluate_system $report_file 
+            echo "----------------------------------------"
+            echo "Report saved to $report_file" 
+            tail -n 5 "$report_file"         
+        elif [ "$mode" == "HA" ]; then
+            # Harden system
+            report_file=$(create_report "Hardening")
+            harden_system $report_file 
+            echo "----------------------------------------"
+            echo "Report saved to $report_file"
+            tail -n 5 "$report_file"
+        elif [ "$mode" == "HELP" ]; then
+            # Show valid modules to choose from and show description of selected module
+            module=$(whiptail --backtitle "Hardening as Code Project v1" --title "Modules" --menu "Choose a module to view its description" 20 60 4 \
+            $(printf "%s\n" "${valid_modules[@]}") 3>&1 1>&2 2>&3)
+            exitstatus=$?
+            if [ $exitstatus -eq 0 ]; then
+                description=$(./modules/$module.sh "HELP")
+                whiptail --backtitle "Hardening as Code Project v1" --title "Module Description" --msgbox "$description" 15 60
+                main_menu
+            else
+                main_menu
+            fi
         else
-            log_warning "User cancelled"
+            log_error "Invalid mode"
         fi
     else
-        log_error "Invalid mode"
+        log_warning "User cancelled"
     fi
-else
-    log_warning "User cancelled"
-fi
 }
 
-evaluate_system() {
-    local title="Evaluating System"
-    local description="Please wait while evaluating system..."
-    local progress=0
 
+evaluate_system() {
     mode="EV"
     accu_score=0
     success=0
-    #iterate over modules and execute them with appropriate mode, if module exits with 0, add score to total score
-    for (( i=0; i<${#modules[@]}; i+=2 )); do
-        module_name=${modules[$i]}
-        module_score=${modules[$i+1]}
-        if [ -f "$MODULES_DIR/$module_name.sh" ] && [ -x "$MODULES_DIR/$module_name.sh" ]; then
-            "$MODULES_DIR/$module_name.sh" "$mode"
+    report_file="$1"
+    for module in "${!valid_modules[@]}"; do
+        module_name=${valid_modules[$module]}   # Secure Boot
+        module_score=$(echo "${modules[$module_name]}" | cut -d' ' -f2) # 4
+        module_path=$(echo "${modules[$module_name]}" | cut -d' ' -f1) # secure_boot                                                         
+        if [ -f "$MODULES_DIR/$module_path.sh" ] && [ -x "$MODULES_DIR/$module_path.sh" ]; then
+            "$MODULES_DIR/$module_path.sh" "$mode"
             if [ $? -eq 0 ]; then
                 accu_score=$((accu_score + module_score))
                 success=$((success + 1))
+                log_success "Module passed: $module_name ($module_score)"
+                echo " - $module_name: PASSED ($module_score)" >> "$report_file"
+            else
+                log_error "Module failed: $module_name ($module_score)"
+                echo " - $module_name: FAILED ($module_score)" >> "$report_file"
             fi
         else
             log_warning "Module not found: $module_name"
         fi
-        sleep 0.5
-        progress=$(((i + 1) * 100 / ${#modules[@]}))
-        echo $module_name 
-        echo $progress | whiptail --gauge "$description" 10 50 $progress
     done
-    score=$((accu_score * 100 / totale_score))
-    
-    whiptail --backtitle "Hardening as Code Project v1" --title "Evaluation Report" --msgbox "Evaluation Report:\n\nScore: $score%\n - Successful Checks: $success\n - Failed Checks: $((${#modules[@]} / 2 - success))" 15 60
+    score=$((accu_score * 100 / total_score))
+    echo "----------------------------------------" >> "$report_file"
+    echo "Evaluation Score: $score%" >> "$report_file"
+    echo "Modules Passed: $success" >> "$report_file"
+    echo "Modules Failed: $((${#valid_modules[@]} - success))" >> "$report_file"
+    echo "----------------------------------------" >> "$report_file"
 }
 
 harden_system() {
-    sleep 5
-    report="Hardening Report:\n - Successful hardening steps\n - Errors encountered during hardening"
-    score=90 
+    mode="HA"
+    accu_score=0
+    success=0
+    report_file="$1"
+    for module in "${!valid_modules[@]}"; do
+        module_name=${valid_modules[$module]}   # Secure Boot
+        module_score=$(echo "${modules[$module_name]}" | cut -d' ' -f2) # 4
+        module_path=$(echo "${modules[$module_name]}" | cut -d' ' -f1) # secure_boot   
+        if [ -f "$MODULES_DIR/$module_path.sh" ] && [ -x "$MODULES_DIR/$module_path.sh" ]; then
+            "$MODULES_DIR/$module_path.sh" "EV"
+            if [ $? -eq 0 ]; then
+                accu_score=$((accu_score + module_score))
+                success=$((success + 1))
+                log_success "Module passed: $module_name ($module_score)"
+                echo " - $module_name: PASSED ($module_score)" >> "$report_file"
+            else 
+                "$MODULES_DIR/$module_path.sh" "$mode"
+                if [ $? -eq 0 ]; then
+                    accu_score=$((accu_score + module_score))
+                    success=$((success + 1))
+                    log_success "Module Applied: $module_name ($module_score)"
+                    echo " - $module_name: APPLIED ($module_score)" >> "$report_file"
+                else
+                    log_error "Module failed: $module_name ($module_score)"
+                    echo " - $module_name: FAILED ($module_score)" >> "$report_file"
+                fi
+            fi
+        else
+            log_warning "Module not found: $module_name"
+        fi
+        
+        
+    done
+    score=$((accu_score * 100 / total_score))
+    echo "----------------------------------------" >> "$report_file"
+    echo "Hardening Score: $score%" >> "$report_file"
+    echo "Modules Applied: $success" >> "$report_file"
+    echo "Modules Failed: $((${#valid_modules[@]} - success))" >> "$report_file"
+    echo "----------------------------------------" >> "$report_file"
 }
-
 
 # Disclaimer
 whiptail --backtitle "Hardening as Code Project v1" --title "Disclaimer" --msgbox "This script is provided as-is without warranty of any kind and is intended for educational purposes only. \n\nThe author will not be held liable for any damages arising from the use of this script. \n\nUse at your own risk. \n\nPress OK to continue.\n\nCredits: @Eljakani" 15 60
 
-# Load All Modules
-modules=()
-totale_score=0
-progress=0
-total_modules=$(wc -l < "$CONFIG_FILE")
 
-while IFS= read -r line || [[ -n "$line" ]]; do
-    module_name=$(echo "$line" | cut -d' ' -f1)
-    module_score=$(echo "$line" | cut -d' ' -f2)
-
-    if [ -z "$module_score" ]; then
-        module_score=2
-        log_warning "Module score not provided for: $module_name. Setting default score to 2."
-    fi
-
-    if [ -f "$MODULES_DIR/$module_name.sh" ] && [ -x "$MODULES_DIR/$module_name.sh" ]; then
-        modules+=("$module_name" "$module_score")
-        totale_score=$((totale_score + module_score))
-    elif [ -f "$MODULES_DIR/$module_name.sh" ] && [ ! -x "$MODULES_DIR/$module_name.sh" ]; then
-        log_warning "Module not executable: $module_name, changing permissions..."
-        chmod +x "$MODULES_DIR/$module_name.sh"
-        modules+=("$module_name" "$module_score")
-        totale_score=$((totale_score + module_score))
+process_module() {
+    local module_name="$1"
+    local module_path=$(echo "$2" | cut -d' ' -f1)
+    local module_score=$(echo "$2" | cut -d' ' -f2)
+    if [ -f "$MODULES_DIR/$module_path.sh" ]; then
+        chmod +x "$MODULES_DIR/$module_path.sh"
+        valid_modules+=("$module_name")
+        total_score=$((total_score + module_score))
     else
-        log_warning "Module not found or not executable: $module_name"
+        log_warning "Module not found: $module_name"
     fi
-
-    progress=$((progress + 1))
-    echo $((progress * 100 / total_modules)) | whiptail --gauge "Loading Modules..." 10 50 $((progress * 100 / total_modules))
-    sleep 0.5
-done < "$CONFIG_FILE"
-
-
+    
+}
+# Load All Modules
+valid_modules=()
+total_score=0
+# Main Processing of Modules declaration
+for module in "${!modules[@]}"; do
+    process_module "$module" "${modules[$module]}"
+done
 # Number of modules
-whiptail --backtitle "Hardening as Code Project v1" --title "Modules Loaded" --msgbox "Loaded $((${#modules[@]} / 2)) modules" 10 60
+whiptail --backtitle "Hardening as Code Project v1" --title "Modules Loaded" --msgbox "Loaded $((${#valid_modules[@]} / 2)) modules" 10 60
 
 main_menu
