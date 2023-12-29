@@ -17,4 +17,12 @@ declare -A modules=(
     ["Managment of Kernel Modules Options"]="mkm_kernel_opts 4"
     ["Abnormal error handling kernel Compile Options"]="aeh_kernel_compile_opts 4"
     ["Security functions kernel Compile Options"]="sf_kernel_compile_opts 4"
+    ["Plugins Kernel Compile Options"]="pg_kernel_compile_opts 4"
+    ["IP stack kernel Compile Options"]="ip_kernel_compile_opts 4"
+    ["Kernel Behaviors Compile Options"]="kb_kernel_compile_opts 4"
+    ["Hardware Architecture dependent Configuration"]="archi_dep_compile_opts 4"
+    ["Typical partitioning scheme"]="typical_partitioning_scheme 2"
+    ["Access restrictions on /boot"]="restrict_boot_mounting 3"
+
+
 )

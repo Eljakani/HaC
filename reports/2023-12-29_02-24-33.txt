@@ -1,0 +1,12 @@
+Hardening as Code Project v1
+Mode: Evaluation
+Date: Fri Dec 29 02:24:33 AM +01 2023
+----------------------------------------
+System Details:
+ - OS: Ubuntu
+ - Kernel: 6.5.0-14-generic
+ - Architecture: x86_64
+ - Hostname: eljakani
+ - IP Address: 10.0.2.15
+----------------------------------------
+Evaluation Results:

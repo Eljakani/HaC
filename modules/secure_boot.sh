@@ -1,8 +1,7 @@
 #!/bin/bash
 
 function evaluate() {
-    exit 0
-    # check mokutil is installed and install if not
+    
     if ! command -v mokutil &> /dev/null; then
         apt install mokutil -y
     fi
@@ -16,8 +15,6 @@ function evaluate() {
 
 
 function harden() {
-    exit 0
-    # check mokutil is installed and install if not
     if ! command -v mokutil &> /dev/null; then
         apt install mokutil -y
     fi
