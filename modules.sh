@@ -23,6 +23,13 @@ declare -A modules=(
     ["Hardware Architecture dependent Configuration"]="archi_dep_compile_opts 4"
     ["Typical partitioning scheme"]="typical_partitioning_scheme 2"
     ["Access restrictions on /boot"]="restrict_boot_mounting 3"
+    ["Removing the unused user accounts"]="rm_unused_accounts 1"
+    ["Configuring a timeout on local user sessions"]="timeout_local_user_sessions 2"
+    ["Disabling the service accounts"]="disable_service_accounts 2"
+    ["Changing the default value of UMASK"]="umask_value 3"
+    ["Using Mandatory Access Control features"]="m_access_control 3"
+    ["Create a group dedicated to the use of sudo"]="sudo_group 3"
+    ["Sudo Configuration Guidelines"]="sudo_config 2"
 
 
 )
