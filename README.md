@@ -1,44 +1,52 @@
-# Hardening as Code (HaC) Project
-
-This repository contains a collection of Bash scripts to automate security configurations and best practices for Linux systems, implementing Hardening as Code (HaC) from the hardware level to the application level.
+# HaC
 
 ## Overview
 
-The goal of this project is to provide a set of scripts that can be used to harden Linux systems, making them more secure by automating various security measures. The scripts cover configurations related to the operating system, network security, user accounts, kernel hardening, and more.
+This Linux hardening script is designed to enhance the security of a Linux system by implementing recommendations from the ANSSI (Agence nationale de la sécurité des systèmes d'information) V2 guidelines. The script follows a modular structure, with each security recommendation represented as a separate module.
 
-## Getting Started
+## Project Structure
 
-### Prerequisites
+The project structure is organized as follows:
 
-- A Linux system (compatible with Debian-based distributions only).
-- `sudo` privileges for executing system-level commands.
-- Basic knowledge of Bash scripting.
+- **`modules/` Directory:** Contains individual modules, each addressing specific security recommendations. Each module has its own bash script (`*.sh`) with functions for hardening, evaluation, and help.
 
-### Usage
+- **`modules.sh` File:** Central configuration file mapping each module to its score and path. This file is sourced in the main script (`run.sh`) for dynamic module loading.
 
-1. Clone the repository:
+- **`run.sh` Script:** The main script that orchestrates the execution of module functions. It handles scoring, report generation, and the overall project workflow.
 
-    ```bash
-    git clone https://github.com/Eljakani/HaC.git
-    cd HaC
-    ```
+- **`reports/` Directory:** Intended for storing generated reports on the hardening status of the server.
 
-2. Run the scripts:
+# Modules
 
-    ```bash
-    chmod +x run.sh
-    ./run.sh
-    ```
+ - Each module is designed to address a specific ANSSI recommendation.
+ - Modules are modular, allowing for easy addition or removal.
+ - Module scripts follow a consistent structure with hardening, evaluation, and help functions.
 
-3. Follow any prompts and instructions provided by the scripts.
+## Usage
 
-## Contributing
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/Eljakani/HaC.git
+   cd HaC ```
 
-If you have suggestions, improvements, or additional hardening measures, feel free to contribute to this project. Fork the repository, make your changes, and submit a pull request.
+## Review Modules:
 
-## Acknowledgments
+Explore the modules/ directory to understand each module's purpose and functionality.
 
-- Inspired by the need for automating security configurations in a Linux environment.
-- Built with community-driven collaboration in mind.
+## Configure Modules:
 
+Update the modules.sh file with module scores and paths.
 
+## Run the Script:
+
+Execute the main script to initiate the hardening process.
+```bash
+   sudo ./run.sh
+```
+## Review Reports:
+
+Generated reports can be found in the reports/ directory.
+
+## Disclaimer
+
+This script is provided as-is and should be tested in a controlled environment before applying to production systems.
