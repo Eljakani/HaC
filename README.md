@@ -27,10 +27,11 @@ The project structure is organized as follows:
 
 ## Usage
 
-1. **Clone the Repository:**
+**Clone the Repository:**
    ```bash
    git clone https://github.com/Eljakani/HaC.git
-   cd HaC ```
+   cd HaC
+```
 
 ## Review Modules:
 
