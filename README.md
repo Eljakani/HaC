@@ -2,6 +2,7 @@
 <p align="center">
   <img src="https://hac.surge.sh/HaC.png" alt="HaC Logo"/>
 </p>
+
 ## Overview
 
 This Linux hardening script is designed to enhance the security of a Linux system by implementing recommendations from the ANSSI (Agence nationale de la sécurité des systèmes d'information) V2 guidelines. The script follows a modular structure, with each security recommendation represented as a separate module.
