@@ -30,6 +30,8 @@ declare -A modules=(
     ["Using Mandatory Access Control features"]="m_access_control 3"
     ["Create a group dedicated to the use of sudo"]="sudo_group 3"
     ["Sudo Configuration Guidelines"]="sudo_config 2"
+    ["Using unprivileged users as target for sudo commands"]="unprivileged_users 2"
+    ["Limiting the number of commands requiring the use of the EXEC directive"]="limit_exec_directive 3"
 
 
 )
